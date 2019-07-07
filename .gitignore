@@ -1,0 +1,10 @@
+.gitignore
+.idea/.gitignore
+.idea/VNExtendedSTM32.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/serialmonitor_settings.xml
+.idea/vcs.xml
+CMakeLists.txt
+Drivers/CMSIS/Device/ST/STM32L4xx/Source/
+cmake-build-debug/
