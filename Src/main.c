@@ -60,8 +60,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
- struct gps_state gps_handle;
- uint8_t recv_char;
+volatile struct gps_state gps_handle;
+volatile uint8_t recv_char;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef * uart) {
   if (uart == &huart1) {
