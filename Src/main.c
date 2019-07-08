@@ -21,12 +21,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "hcsr04.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +49,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+char buf[30];
+uint8_t len;
+float Distance;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,17 +97,27 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
+  MX_TIM15_Init();
   /* USER CODE BEGIN 2 */
-
+  HCSR04_Init(&htim15);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
+
+    HCSR04_Read(&Distance);
+
+    HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
+
+    len = sprintf(buf, "Distance: %.2f\n\r", Distance);
+    HAL_UART_Transmit(&huart2, (uint8_t*)buf, len, 20);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    HAL_Delay(20);
   }
   /* USER CODE END 3 */
 }
