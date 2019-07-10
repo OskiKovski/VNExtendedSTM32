@@ -82,6 +82,12 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 
     /* I2C1 clock enable */
     __HAL_RCC_I2C1_CLK_ENABLE();
+
+    /* I2C1 interrupt Init */
+    HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+    HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
   /* USER CODE BEGIN I2C1_MspInit 1 */
 
   /* USER CODE END I2C1_MspInit 1 */
@@ -105,6 +111,9 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
 
+    /* I2C1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);
+    HAL_NVIC_DisableIRQ(I2C1_ER_IRQn);
   /* USER CODE BEGIN I2C1_MspDeInit 1 */
 
   /* USER CODE END I2C1_MspDeInit 1 */
@@ -112,7 +121,35 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 } 
 
 /* USER CODE BEGIN 1 */
+uint8_t I2C_ReadByte(uint8_t addr, uint8_t reg)
+{
+  uint8_t data = 0;
+  uint8_t d;
+  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY);
+  d = HAL_I2C_Master_Transmit(&hi2c1, addr << 1, &reg, 1, 100);
+  if ( d != HAL_OK) {
+    return d;
+  }
 
+  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY);
+  d = HAL_I2C_Master_Receive(&hi2c1, addr << 1, &data, 1, 100);
+  if ( d != HAL_OK) {
+    return d;
+  }
+  return data;
+}
+
+uint8_t I2C_WriteByte(uint8_t addr, uint8_t reg, uint8_t data)
+{
+  uint8_t buf[] = {reg, data};
+  uint8_t d;
+  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY);
+  d = HAL_I2C_Master_Transmit(&hi2c1, addr << 1, buf, 2, 100);
+  if ( d != HAL_OK) {
+    return d;
+  }
+  return HAL_OK;
+}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

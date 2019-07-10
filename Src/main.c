@@ -29,6 +29,7 @@
 #include "gps.h"
 #include <string.h>
 #include <stdio.h>
+#include "HMC5883L.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -103,7 +104,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
-
   /* USER CODE BEGIN 2 */
   gps_handle = gps_init(&huart1);
   HAL_UART_Receive_IT(&huart1, &recv_char, 1);
@@ -111,13 +111,15 @@ int main(void)
   char output_buffer[100];
   for (uint8_t i = 0; i < 100; i++)
     output_buffer[i] = '\0';
+
+  HMC5883L_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    sprintf(output_buffer, "\r\n");
+    /*sprintf(output_buffer, "\r\n");
     HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
 
     sprintf(output_buffer, "Data: %02d-%02d-20%02d\r\n", gps_handle.date_day, gps_handle.date_mounth, gps_handle.date_year);
@@ -154,9 +156,13 @@ int main(void)
     HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
 
     sprintf(output_buffer, "Wertykalna precyzja wyznaczenia pozycji (VDOP): %f\r\n", gps_handle.vdop);
-    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);*/
+    int16_t MagnetometerAngle = HMC5883L_GetAngle();
+
+    sprintf(output_buffer, "Angle is: %d\r\n", MagnetometerAngle);
+    HAL_UART_Transmit(&huart2, (uint8_t*)output_buffer, strlen(output_buffer), 100);
     /* USER CODE END WHILE */
-    HAL_Delay(1000);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
