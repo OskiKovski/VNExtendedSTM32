@@ -5,6 +5,8 @@
 .idea/modules.xml
 .idea/serialmonitor_settings.xml
 .idea/vcs.xml
+.idea/runConfigurations/OCD_VNExtendedSTM32.xml
 CMakeLists.txt
 Drivers/CMSIS/Device/ST/STM32L4xx/Source/
 cmake-build-debug/
+.idea/encodings.xml

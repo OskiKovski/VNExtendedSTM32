@@ -119,7 +119,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /*sprintf(output_buffer, "\r\n");
+    sprintf(output_buffer, "\r\n");
     HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
 
     sprintf(output_buffer, "Data: %02d-%02d-20%02d\r\n", gps_handle.date_day, gps_handle.date_mounth, gps_handle.date_year);
@@ -156,7 +156,7 @@ int main(void)
     HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
 
     sprintf(output_buffer, "Wertykalna precyzja wyznaczenia pozycji (VDOP): %f\r\n", gps_handle.vdop);
-    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);*/
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     int16_t MagnetometerAngle = HMC5883L_GetAngle();
 
     sprintf(output_buffer, "Angle is: %d\r\n", MagnetometerAngle);
@@ -164,6 +164,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
