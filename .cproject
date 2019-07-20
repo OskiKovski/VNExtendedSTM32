@@ -78,7 +78,7 @@
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script.1126785633" name="Linker Script (-T)" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script" value="../STM32L432KCUx_FLASH.ld" valueType="string" />
 								<option id="gnu.c.link.option.libs.941285502" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs" />
 								<option id="gnu.c.link.option.paths.1071981292" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths" />
-								<option id="gnu.c.link.option.ldflags.1446199086" superClass="gnu.c.link.option.ldflags" value="-specs=nosys.specs -specs=nano.specs" valueType="string" />
+								<option id="gnu.c.link.option.ldflags.1446199086" superClass="gnu.c.link.option.ldflags" value="-specs=nosys.specs -specs=nano.specs -u _printf_float -u _scanf_float" valueType="string" />
 								<option id="gnu.c.link.option.other.1773582312" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList" />
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.935290532" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)" />
@@ -89,7 +89,7 @@
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.script.1783939846" name="Linker Script (-T)" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.script" value="../STM32L432KCUx_FLASH.ld" valueType="string" />
 								<option id="gnu.cpp.link.option.libs.1161310309" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs" />
 								<option id="gnu.cpp.link.option.paths.961829207" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths" />
-								<option id="gnu.cpp.link.option.flags.2109977410" superClass="gnu.cpp.link.option.flags" value="-specs=nosys.specs -specs=nano.specs" valueType="string" />
+								<option id="gnu.cpp.link.option.flags.2109977410" superClass="gnu.cpp.link.option.flags" value="-specs=nosys.specs -specs=nano.specs -u _printf_float -u _scanf_float" valueType="string" />
 								<option id="gnu.cpp.link.option.other.1003025610" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false" valueType="stringList" />
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1792050556" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)" />

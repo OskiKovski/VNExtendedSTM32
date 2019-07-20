@@ -27,7 +27,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "gps.h"
+#include <string.h>
 #include <stdio.h>
+#include "HMC5883L.h"
 #include "hcsr04.h"
 /* USER CODE END Includes */
 
@@ -62,7 +65,15 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+volatile struct gps_state gps_handle;
+volatile uint8_t recv_char;
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef * uart) {
+  if (uart == &huart1) {
+    gps_recv_char(&gps_handle, recv_char);
+    HAL_UART_Receive_IT(&huart1, &recv_char, 1);
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -100,6 +111,14 @@ int main(void)
   MX_TIM15_Init();
   /* USER CODE BEGIN 2 */
   HCSR04_Init(&htim15);
+  gps_handle = gps_init(&huart1);
+  HAL_UART_Receive_IT(&huart1, &recv_char, 1);
+
+  char output_buffer[100];
+  for (uint8_t i = 0; i < 100; i++)
+    output_buffer[i] = '\0';
+
+  HMC5883L_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
