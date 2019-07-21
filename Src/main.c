@@ -28,10 +28,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "gps.h"
-#include <string.h>
-#include <stdio.h>
 #include "HMC5883L.h"
 #include "hcsr04.h"
+#include <string.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,6 +126,49 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+    sprintf(output_buffer, "\r\n");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Data: %02d-%02d-20%02d\r\n", gps_handle.date_day, gps_handle.date_mounth, gps_handle.date_year);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Czas: %02d:%02d:%02d\r\n", gps_handle.time_hour, gps_handle.time_min, gps_handle.time_sec);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Szerokosc geograficzna: %f %c\r\n", gps_handle.latitude, gps_handle.latitude_direction);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Dlugosc geograficzna: %f %c\r\n", gps_handle.longitude, gps_handle.longitude_direction);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Wysokosc: %f m n.p.m.\r\n", gps_handle.altitude);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Predkosc w wezlach: %f\r\n", gps_handle.speed_knots);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Predkosc w km/h: %f\r\n", gps_handle.speed_kilometers);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Liczba widocznych satelit: %d\r\n", gps_handle.satelites_number);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Jakosc okreslonej pozycji: %d\r\n", gps_handle.quality);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Precyzja wyznaczenia pozycji (DOP): %f\r\n", gps_handle.dop);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Horyzontalna precyzja wyznaczenia pozycji (HDOP): %f\r\n", gps_handle.hdop);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Wertykalna precyzja wyznaczenia pozycji (VDOP): %f\r\n", gps_handle.vdop);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+    int16_t MagnetometerAngle = HMC5883L_GetAngle();
+
+    sprintf(output_buffer, "Angle is: %d\r\n", MagnetometerAngle);
+    HAL_UART_Transmit(&huart2, (uint8_t*)output_buffer, strlen(output_buffer), 100);
+
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
     HCSR04_Read(&distance0, HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin, HCSR04_0_Echo_GPIO_Port, HCSR04_0_Echo_Pin);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
@@ -141,7 +184,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_Delay(20);
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
