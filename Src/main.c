@@ -54,7 +54,7 @@
 /* USER CODE BEGIN PV */
 char buf[30];
 uint8_t len;
-float Distance;
+float distance0, distance1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,7 +68,7 @@ void SystemClock_Config(void);
 volatile struct gps_state gps_handle;
 volatile uint8_t recv_char;
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef * uart) {
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uart) {
   if (uart == &huart1) {
     gps_recv_char(&gps_handle, recv_char);
     HAL_UART_Receive_IT(&huart1, &recv_char, 1);
@@ -109,8 +109,10 @@ int main(void)
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_TIM15_Init();
+  MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
-  HCSR04_Init(&htim15);
+  HCSR04_Init(&htim15, HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin);
+  HCSR04_Init(&htim16, HCSR04_1_Trig_GPIO_Port, HCSR04_1_Trig_Pin);
   gps_handle = gps_init(&huart1);
   HAL_UART_Receive_IT(&huart1, &recv_char, 1);
 
@@ -123,16 +125,19 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1) {
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
-
-    HCSR04_Read(&Distance);
-
+    HCSR04_Read(&distance0, HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin, HCSR04_0_Echo_GPIO_Port, HCSR04_0_Echo_Pin);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
+    len = sprintf(buf, "distance0: %.2f\n\r", distance0);
+    HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
 
-    len = sprintf(buf, "Distance: %.2f\n\r", Distance);
-    HAL_UART_Transmit(&huart2, (uint8_t*)buf, len, 20);
+    HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
+    HCSR04_Read(&distance1, HCSR04_1_Trig_GPIO_Port, HCSR04_1_Trig_Pin, HCSR04_1_Echo_GPIO_Port, HCSR04_1_Echo_Pin);
+    HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
+    len = sprintf(buf, "distance1: %.2f\n\r", distance1);
+    HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

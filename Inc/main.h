@@ -68,7 +68,7 @@ void Error_Handler(void);
 #define HCSR04_0_Trig_GPIO_Port GPIOA
 #define HCSR04_1_Trig_Pin GPIO_PIN_4
 #define HCSR04_1_Trig_GPIO_Port GPIOA
-#define HCSR04_1_Echo_Pin GPIO_PIN_6
+#define HCSR04_1_Echo_Pin GPIO_PIN_7
 #define HCSR04_1_Echo_GPIO_Port GPIOA
 #define LED_Red_Pin GPIO_PIN_8
 #define LED_Red_GPIO_Port GPIOA

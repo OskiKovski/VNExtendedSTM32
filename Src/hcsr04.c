@@ -28,57 +28,71 @@ void HCSR04_Delay(uint16_t time_us)
 	while(htim_hcsr04->Instance->CNT <= time_us);
 }
 
-HCSR04_STATUS HCSR04_Init(TIM_HandleTypeDef *htim)
+HCSR04_STATUS HCSR04_Init(TIM_HandleTypeDef *htim, GPIO_TypeDef *GPIOx_trig, uint16_t GPIO_Pin_trig)
 {
 	 htim_hcsr04 = htim;
 
 	HAL_TIM_Base_Start(htim_hcsr04);
 	// Pins are preconfigured in CubeMX
-	HAL_GPIO_WritePin(HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOx_trig, GPIO_Pin_trig, GPIO_PIN_RESET);
 
 	return HCSR04_OK;
 }
 
-HCSR04_STATUS HCSR04_CaptureEcho(uint16_t *Counter)
+HCSR04_STATUS HCSR04_CaptureEcho(uint16_t *Counter,
+    GPIO_TypeDef *GPIOx_trig,
+    uint16_t GPIO_Pin_trig,
+    GPIO_TypeDef *GPIOx_echo,
+    uint16_t GPIO_Pin_echo)
 {
 	uint32_t timeout;
 
-	HAL_GPIO_WritePin(HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin, GPIO_PIN_SET); // Trigger to high - triggered
+//	GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin
+
+	HAL_GPIO_WritePin(GPIOx_trig, GPIO_Pin_trig, GPIO_PIN_SET); // Trigger to high - triggered
 	HCSR04_Delay(10); // Keep high per 10 us
-	HAL_GPIO_WritePin(HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin, GPIO_PIN_RESET); // Trigger to low again
+	HAL_GPIO_WritePin(GPIOx_trig, GPIO_Pin_trig, GPIO_PIN_RESET); // Trigger to low again
 
 	timeout = _HCSR04_TIMEOUT; // Define timeout
 
-	while(!HAL_GPIO_ReadPin(HCSR04_0_Echo_GPIO_Port, HCSR04_0_Echo_Pin)) // Wait for high state on Echo
+	while(!HAL_GPIO_ReadPin(GPIOx_echo, GPIO_Pin_echo)) // Wait for high state on Echo
 	{
 		if(timeout-- == 0x00)
 			return HCSR04_ERROR; // Error if timeout is reached
 	}
 
 	htim_hcsr04->Instance->CNT = 0;
-	while(HAL_GPIO_ReadPin(HCSR04_0_Echo_GPIO_Port, HCSR04_0_Echo_Pin)){} // Wait while Echo is high
+	while(HAL_GPIO_ReadPin(GPIOx_echo, GPIO_Pin_echo)){} // Wait while Echo is high
 	*Counter =  htim_hcsr04->Instance->CNT; // Read us from timer
 
 	return HCSR04_OK;
 }
 
 #ifdef HCSR04_HIGH_PRECISION
-HCSR04_STATUS HCSR04_Read(float *Result)
+HCSR04_STATUS HCSR04_Read(float *Result,
+    GPIO_TypeDef *GPIOx_trig,
+    uint16_t GPIO_Pin_trig,
+    GPIO_TypeDef *GPIOx_echo,
+    uint16_t GPIO_Pin_echo)
 {
 	uint16_t time;
 
-	HCSR04_CaptureEcho(&time);
+	HCSR04_CaptureEcho(&time, GPIOx_trig, GPIO_Pin_trig, GPIOx_echo, GPIO_Pin_echo);
 
 	*Result = (float)time / 2.0 * 0.0343;
 
 	return HCSR04_OK;
 }
 #else
-HCSR04_STATUS HCSR04_Read(uint16_t *Result)
+HCSR04_STATUS HCSR04_Read(uint16_t *Result,
+                          GPIO_TypeDef *GPIOx_trig,
+                          uint16_t GPIO_Pin_trig,
+                          GPIO_TypeDef *GPIOx_echo,
+                          uint16_t GPIO_Pin_echo);
 {
 	uint16_t time;
 
-	HCSR04_CaptureEcho(&time);
+	HCSR04_CaptureEcho(&time, GPIOx_trig, GPIO_Pin_trig, GPIOx_echo, GPIO_Pin_echo);
 
 	*Result =  time / 58;
 

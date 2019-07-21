@@ -20,11 +20,19 @@ typedef enum{
 	HCSR04_ERROR = 1
 } HCSR04_STATUS;
 
-HCSR04_STATUS HCSR04_Init(TIM_HandleTypeDef *htim);
+HCSR04_STATUS HCSR04_Init(TIM_HandleTypeDef *htim, GPIO_TypeDef *GPIOx_trig, uint16_t GPIO_Pin_trig);
 #ifdef HCSR04_HIGH_PRECISION
-HCSR04_STATUS HCSR04_Read(float *Result);
+HCSR04_STATUS HCSR04_Read(float *Result,
+                          GPIO_TypeDef *GPIOx_trig,
+                          uint16_t GPIO_Pin_trig,
+                          GPIO_TypeDef *GPIOx_echo,
+                          uint16_t GPIO_Pin_echo);
 #else
-HCSR04_STATUS HCSR04_Read(uint16_t *Result);
+HCSR04_STATUS HCSR04_Read(uint16_t *Result,
+                          GPIO_TypeDef *GPIOx_trig,
+                          uint16_t GPIO_Pin_trig,
+                          GPIO_TypeDef *GPIOx_echo,
+                          uint16_t GPIO_Pin_echo);
 #endif
 
 #endif /* HCSR04_H_ */
