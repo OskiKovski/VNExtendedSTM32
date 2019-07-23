@@ -111,8 +111,8 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-//  HCSR04_Init(&htim1);
-  HCSR04_Init(&htim2);
+  HCSR04_0_Init(&htim1);
+  HCSR04_1_Init(&htim2);
 
   gps_handle = gps_init(&huart1);
   HAL_UART_Receive_IT(&huart1, &recv_char, 1);
@@ -170,15 +170,11 @@ int main(void)
     sprintf(output_buffer, "Angle is: %d\r\n", MagnetometerAngle);
     HAL_UART_Transmit(&huart2, (uint8_t*)output_buffer, strlen(output_buffer), 100);
 
-    HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
-    HCSR04_Read(&distance0);
-    HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
+    HCSR04_0_Read(&distance0);
     len = sprintf(buf, "distance0: %.2f\n\r", distance0);
     HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
 
-    HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
-    HCSR04_Read(&distance1);
-    HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
+    HCSR04_1_Read(&distance1);
     len = sprintf(buf, "distance1: %.2f\n\r", distance1);
     HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
 
@@ -256,7 +252,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+  HCSR04_TIM_IC_CaptureCallback(htim);
+}
 /* USER CODE END 4 */
 
 /**

@@ -24,11 +24,17 @@ typedef enum{
   HCSR04_ERROR = 1
 } HCSR04_STATUS;
 
-HCSR04_STATUS HCSR04_Init(TIM_HandleTypeDef *htim);
+HCSR04_STATUS HCSR04_0_Init(TIM_HandleTypeDef *htim);
+HCSR04_STATUS HCSR04_1_Init(TIM_HandleTypeDef *htim);
 #ifdef HCSR04_HIGH_PRECISION
-HCSR04_STATUS HCSR04_Read(float *Result);
+HCSR04_STATUS HCSR04_0_Read(float *Result);
 #else
-HCSR04_STATUS HCSR04_Read(uint16_t *Result);
+HCSR04_STATUS HCSR04_0_Read(uint16_t *Result);
+#endif
+#ifdef HCSR04_HIGH_PRECISION
+HCSR04_STATUS HCSR04_1_Read(float *Result);
+#else
+HCSR04_STATUS HCSR04_1_Read(uint16_t *Result);
 #endif
 
 void HCSR04_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);

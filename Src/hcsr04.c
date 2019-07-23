@@ -16,36 +16,63 @@
 
 #include "hcsr04.h"
 
-TIM_HandleTypeDef *htim_hcsr04;
+TIM_HandleTypeDef *htim_hcsr04_0;
+TIM_HandleTypeDef *htim_hcsr04_1;
 #ifdef HCSR04_HIGH_PRECISION
-volatile float Hcsr04_Distance;
+volatile float Hcsr04_0_Distance;
+volatile float Hcsr04_1_Distance;
 #else
 volatile uint16_t  Hcsr04_Distance;
 #endif
 
-HCSR04_STATUS HCSR04_Init(TIM_HandleTypeDef *htim)
+void HCSR04_Channels_Init(TIM_HandleTypeDef *htim)
 {
-  htim_hcsr04 = htim;
+  HAL_TIM_Base_Start(htim);
+  HAL_TIM_PWM_Start(htim, HCSR04_PWM_CHANNEL);
+  HAL_TIM_IC_Start(htim, HCSR04_START_CHANNEL);
+  HAL_TIM_IC_Start_IT(htim, HCSR04_STOP_CHANNEL);
+}
 
-  HAL_TIM_Base_Start(htim_hcsr04);
-  HAL_TIM_PWM_Start(htim_hcsr04, HCSR04_PWM_CHANNEL);
-  HAL_TIM_IC_Start(htim_hcsr04, HCSR04_START_CHANNEL);
-  HAL_TIM_IC_Start_IT(htim_hcsr04, HCSR04_STOP_CHANNEL);
-
+HCSR04_STATUS HCSR04_0_Init(TIM_HandleTypeDef *htim) {
+  htim_hcsr04_0 = htim;
+  HCSR04_Channels_Init(htim_hcsr04_0);
   return HCSR04_OK;
 }
 
+HCSR04_STATUS HCSR04_1_Init(TIM_HandleTypeDef *htim) {
+  htim_hcsr04_1 = htim;
+  HCSR04_Channels_Init(htim_hcsr04_1);
+  return HCSR04_OK;
+}
+
+
 #ifdef HCSR04_HIGH_PRECISION
-HCSR04_STATUS HCSR04_Read(float *Result)
+HCSR04_STATUS HCSR04_0_Read(float *Result)
 {
-  *Result =  Hcsr04_Distance;
+  *Result =  Hcsr04_0_Distance;
 
   return HCSR04_OK;
 }
 #else
 HCSR04_STATUS HCSR04_Read(uint16_t *Result)
 {
-	*Result =  Hcsr04_Distance;
+	*Result =  Hcsr04_0_Distance;
+
+	return HCSR04_OK;
+}
+#endif
+
+#ifdef HCSR04_HIGH_PRECISION
+HCSR04_STATUS HCSR04_1_Read(float *Result)
+{
+  *Result =  Hcsr04_1_Distance;
+
+  return HCSR04_OK;
+}
+#else
+HCSR04_STATUS HCSR04_Read(uint16_t *Result)
+{
+	*Result =  Hcsr04_1_Distance;
 
 	return HCSR04_OK;
 }
@@ -53,18 +80,29 @@ HCSR04_STATUS HCSR04_Read(uint16_t *Result)
 
 void HCSR04_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
-  if(htim == htim_hcsr04)
+  if(htim == htim_hcsr04_0)
   {
     uint16_t time;
 
 
-    time = (uint16_t)((uint16_t)__HAL_TIM_GetCompare(htim_hcsr04, HCSR04_STOP_CHANNEL) - (uint16_t)__HAL_TIM_GetCompare(htim_hcsr04, HCSR04_START_CHANNEL));
+    time = (uint16_t)((uint16_t)__HAL_TIM_GetCompare(htim_hcsr04_0, HCSR04_STOP_CHANNEL) - (uint16_t)__HAL_TIM_GetCompare(htim_hcsr04_0, HCSR04_START_CHANNEL));
 #ifdef HCSR04_HIGH_PRECISION
-    Hcsr04_Distance = (float)time / 2.0 * 0.0343;
+    Hcsr04_0_Distance = (float)time / 2.0 * 0.0343;
 #else
     Hcsr04_Distance = time / 58;
 #endif
-    HAL_TIM_IC_Start_IT(htim_hcsr04, HCSR04_STOP_CHANNEL);
+    HAL_TIM_IC_Start_IT(htim_hcsr04_0, HCSR04_STOP_CHANNEL);
+  } else if(htim == htim_hcsr04_1) {
+    uint16_t time;
+
+
+    time = (uint16_t)((uint16_t)__HAL_TIM_GetCompare(htim_hcsr04_1, HCSR04_STOP_CHANNEL) - (uint16_t)__HAL_TIM_GetCompare(htim_hcsr04_1, HCSR04_START_CHANNEL));
+#ifdef HCSR04_HIGH_PRECISION
+    Hcsr04_1_Distance = (float)time / 2.0 * 0.0343;
+#else
+    Hcsr04_Distance = time / 58;
+#endif
+    HAL_TIM_IC_Start_IT(htim_hcsr04_1, HCSR04_STOP_CHANNEL);
   }
 }
 
