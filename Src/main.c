@@ -122,11 +122,26 @@ int main(void)
     output_buffer[i] = '\0';
 
   HMC5883L_Init();
+  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+    if(HAL_GPIO_ReadPin(LED_Red_GPIO_Port, LED_Red_Pin) == 1) {
+      HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
+      HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 1);
+    } else if(HAL_GPIO_ReadPin(LED_White_GPIO_Port, LED_White_Pin) == 1) {
+      HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
+      HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 1);
+    } else if(HAL_GPIO_ReadPin(LED_Green_GPIO_Port, LED_Green_Pin) == 1) {
+      HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 0);
+      HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
+    } else if(HAL_GPIO_ReadPin(LED_Blue_GPIO_Port, LED_Blue_Pin) == 1) {
+      HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
+      HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
+    }
+
     sprintf(output_buffer, "\r\n");
     HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
 
