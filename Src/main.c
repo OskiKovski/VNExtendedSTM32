@@ -108,11 +108,12 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
-  MX_TIM15_Init();
-  MX_TIM16_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HCSR04_Init(&htim15, HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin);
-  HCSR04_Init(&htim16, HCSR04_1_Trig_GPIO_Port, HCSR04_1_Trig_Pin);
+//  HCSR04_Init(&htim1);
+  HCSR04_Init(&htim2);
+
   gps_handle = gps_init(&huart1);
   HAL_UART_Receive_IT(&huart1, &recv_char, 1);
 
@@ -170,13 +171,13 @@ int main(void)
     HAL_UART_Transmit(&huart2, (uint8_t*)output_buffer, strlen(output_buffer), 100);
 
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
-    HCSR04_Read(&distance0, HCSR04_0_Trig_GPIO_Port, HCSR04_0_Trig_Pin, HCSR04_0_Echo_GPIO_Port, HCSR04_0_Echo_Pin);
+    HCSR04_Read(&distance0);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
     len = sprintf(buf, "distance0: %.2f\n\r", distance0);
     HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
 
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
-    HCSR04_Read(&distance1, HCSR04_1_Trig_GPIO_Port, HCSR04_1_Trig_Pin, HCSR04_1_Echo_GPIO_Port, HCSR04_1_Echo_Pin);
+    HCSR04_Read(&distance1);
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
     len = sprintf(buf, "distance1: %.2f\n\r", distance1);
     HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
@@ -199,14 +200,21 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
+  /** Configure LSE Drive Capability 
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.MSICalibrationValue = 0;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 16;
+  RCC_OscInitStruct.PLL.PLLN = 24;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -223,7 +231,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -242,6 +250,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  /** Enable MSI Auto calibration 
+  */
+  HAL_RCCEx_EnableMSIPLLMode();
 }
 
 /* USER CODE BEGIN 4 */

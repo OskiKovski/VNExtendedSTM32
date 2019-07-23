@@ -58,22 +58,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MCO_Pin GPIO_PIN_0
-#define MCO_GPIO_Port GPIOA
-#define HCSR04_0_Echo_Pin GPIO_PIN_1
-#define HCSR04_0_Echo_GPIO_Port GPIOA
+#define HCSR04_1_Echo_Pin GPIO_PIN_0
+#define HCSR04_1_Echo_GPIO_Port GPIOA
 #define VCP_TX_Pin GPIO_PIN_2
 #define VCP_TX_GPIO_Port GPIOA
-#define HCSR04_0_Trig_Pin GPIO_PIN_3
-#define HCSR04_0_Trig_GPIO_Port GPIOA
-#define HCSR04_1_Trig_Pin GPIO_PIN_4
+#define HCSR04_1_Trig_Pin GPIO_PIN_3
 #define HCSR04_1_Trig_GPIO_Port GPIOA
-#define HCSR04_1_Echo_Pin GPIO_PIN_7
-#define HCSR04_1_Echo_GPIO_Port GPIOA
-#define LED_Red_Pin GPIO_PIN_8
+#define LED_Red_Pin GPIO_PIN_4
 #define LED_Red_GPIO_Port GPIOA
-#define LED_Blue_Pin GPIO_PIN_11
+#define LED_White_Pin GPIO_PIN_5
+#define LED_White_GPIO_Port GPIOA
+#define LED_Green_Pin GPIO_PIN_6
+#define LED_Green_GPIO_Port GPIOA
+#define LED_Blue_Pin GPIO_PIN_7
 #define LED_Blue_GPIO_Port GPIOA
+#define HCSR04_0_Echo_Pin GPIO_PIN_8
+#define HCSR04_0_Echo_GPIO_Port GPIOA
+#define HCSR04_0_Trig_Pin GPIO_PIN_11
+#define HCSR04_0_Trig_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
@@ -82,10 +84,6 @@ void Error_Handler(void);
 #define VCP_RX_GPIO_Port GPIOA
 #define LD3_Pin GPIO_PIN_3
 #define LD3_GPIO_Port GPIOB
-#define LED_White_Pin GPIO_PIN_4
-#define LED_White_GPIO_Port GPIOB
-#define LED_Green_Pin GPIO_PIN_5
-#define LED_Green_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
