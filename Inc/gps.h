@@ -3,8 +3,9 @@
 
 #include "stm32l4xx_hal.h"
 #include "usart.h"
-#include "stdlib.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
 struct gps_state {
 	UART_HandleTypeDef * uart;
@@ -45,5 +46,7 @@ void gps_process_gprmc(struct gps_state * state);
 void gps_process_gpvtg(struct gps_state * state);
 void gps_process_gpgga(struct gps_state * state);
 void gps_process_gpgsa(struct gps_state * state);
+float course_to(float lat1, float long1, float lat2, float long2);
+float distance_between (float lat1, float long1, float lat2, float long2);
 
 #endif
