@@ -72,7 +72,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void vibrateAllMotorsForGivenTime(int);
 
-void vibrateTheProperDirectionMotorOnce(float);
+void vibrateTheProperDirectionMotorOnce(float, char[100]);
 
 void vibrateMotorsForFinish();
 
@@ -192,17 +192,22 @@ int main(void)
       ++targetPointIndex;
     }
 
-    if (distance0 < 100) {
+    if (distance0 < 100 && distance0 > 20) {
+      sprintf(output_buffer, "IDZ W LEWO");
+      HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
       HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 1);
       HAL_Delay(1000);
       HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
-    } else if (distance1 < 100) {
+    } else if (distance1 < 100 && distance1 > 20) {
+      sprintf(output_buffer, "IDZ W PRAWO");
+      HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
       HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
       HAL_Delay(1000);
       HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
     } else {
       vibrateTheProperDirectionMotorOnce(
-          getCurrentCourseAngle(currentLatitude, currentLongitude, targetLatitude, targetLongitude));
+          getCurrentCourseAngle(currentLatitude, currentLongitude, targetLatitude, targetLongitude),
+          output_buffer);
     }
     /* USER CODE END WHILE */
 
@@ -294,49 +299,67 @@ void vibrateAllMotorsForGivenTime(int time) {
   HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
 }
 
-void vibrateTheProperDirectionMotorOnce(float destinationAngle) {
+void vibrateTheProperDirectionMotorOnce(float destinationAngle, char output_buffer[100]) {
   if ((0 <= destinationAngle && destinationAngle < 22.5) ||
       (337.5 <= destinationAngle && destinationAngle < 360)) { //front
+    sprintf(output_buffer, "IDZ DO PRZODU\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 0);
   } else if (destinationAngle >= 22.5 && destinationAngle < 67.5) {    //front + right
+    sprintf(output_buffer, "IDZ DO PRZODU NA PRAWO SKOS\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 1);
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
     HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 0);
   } else if (destinationAngle >= 67.5 && destinationAngle < 112.5) {    //right side
+    sprintf(output_buffer, "IDZ W PRAWO\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
   } else if (destinationAngle >= 112.5 && destinationAngle < 157.5) {   //back + right
+    sprintf(output_buffer, "IDZ DO TYLU NA PRAWO SKOS\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
     HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
   } else if (destinationAngle >= 157.5 && destinationAngle < 202.5) {   //back
+    sprintf(output_buffer, "IDZ DO TYLU\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
   } else if (destinationAngle >= 202.5 && destinationAngle < 247.5) {   //back + left
+    sprintf(output_buffer, "IDZ DO TYLU W LEWO SKOS\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 1);
     HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, 0);
     HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
   } else if (destinationAngle >= 247.5 && destinationAngle < 292.5) {   //left side
+    sprintf(output_buffer, "IDZ W LEWO\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
   } else if (destinationAngle >= 292.5 && destinationAngle < 337.5) {   // front + left
+    sprintf(output_buffer, "IDZ DO PRZODU W LEWO SKOS\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 1);
     HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 1);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 0);
     HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
   } else {                                                              // all for 2 seconds
+    sprintf(output_buffer, "BLAD\n\r");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
     vibrateAllMotorsForGivenTime(3000);
   }
 }
