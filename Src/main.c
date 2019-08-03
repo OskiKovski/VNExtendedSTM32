@@ -57,8 +57,8 @@ typedef struct strCoor {
 /* USER CODE BEGIN PV */
 const int numberOfPoints = 2;
 coordinate routePoints[2] = {
-    {52.251079, 20.996542},
-    {52.251312, 20.995248}
+    {5225.1079, 2099.6542},
+    {5225.1312, 2099.5248}
 };
 float distance0, distance1, currentLatitude, currentLongitude, targetLatitude, targetLongitude, distanceForTarget;
 int targetPointIndex = 0;
@@ -69,7 +69,6 @@ uint8_t len;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-
 /* USER CODE BEGIN PFP */
 void vibrateAllMotorsForGivenTime(int);
 
@@ -97,11 +96,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uart) {
   * @brief  The application entry point.
   * @retval int
   */
-int main(void) {
+int main(void)
+{
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-
+  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -143,12 +143,44 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+    sprintf(output_buffer, "\r\n");
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Data: %02d-%02d-20%02d\r\n", gps_handle.date_day, gps_handle.date_mounth, gps_handle.date_year);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Czas: %02d:%02d:%02d\r\n", gps_handle.time_hour, gps_handle.time_min, gps_handle.time_sec);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
     targetLatitude = routePoints[targetPointIndex].latitude;
     targetLongitude = routePoints[targetPointIndex].longitude;
+
+    sprintf(output_buffer, "Szerokosc geograficzna celu: %f \r\n", targetLatitude);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Dlugosc geograficzna celu: %f \r\n", targetLongitude);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
     currentLatitude = gps_handle.latitude;
     currentLongitude = gps_handle.longitude;
+
+    sprintf(output_buffer, "Obecna szerokosc geograficzna: %f %c\r\n", currentLatitude, gps_handle.latitude_direction);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Obecna dlugosc geograficzna: %f %c\r\n", currentLongitude, gps_handle.longitude_direction);
+    HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+
+    sprintf(output_buffer, "Angle is: %d\r\n", HMC5883L_GetAngle());
+    HAL_UART_Transmit(&huart2, (uint8_t*)output_buffer, strlen(output_buffer), 100);
+
     HCSR04_0_Read(&distance0);
+    len = sprintf(buf, "distance0: %.2f\n\r", distance0);
+    HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
+
     HCSR04_1_Read(&distance1);
+    len = sprintf(buf, "distance1: %.2f\n\r", distance1);
+    HAL_UART_Transmit(&huart2, (uint8_t *) buf, len, 20);
+
     distanceForTarget = distance_between(currentLatitude, currentLongitude, targetLatitude, targetLongitude);
 
     if (distanceForTarget < 5) {
@@ -173,9 +205,10 @@ int main(void) {
           getCurrentCourseAngle(currentLatitude, currentLongitude, targetLatitude, targetLongitude));
     }
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
+    HAL_Delay(2000);
   }
-  HAL_Delay(5000);
   /* USER CODE END 3 */
 }
 
@@ -183,7 +216,8 @@ int main(void) {
   * @brief System Clock Configuration
   * @retval None
   */
-void SystemClock_Config(void) {
+void SystemClock_Config(void)
+{
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
@@ -194,7 +228,7 @@ void SystemClock_Config(void) {
   __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE | RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
@@ -206,32 +240,36 @@ void SystemClock_Config(void) {
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-                                | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1 | RCC_PERIPHCLK_USART2
-                                       | RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
+                              |RCC_PERIPHCLK_I2C1;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
     Error_Handler();
   }
   /** Configure the main internal regulator output voltage 
   */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK) {
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+  {
     Error_Handler();
   }
   /** Enable MSI Auto calibration 
@@ -326,7 +364,8 @@ float getCurrentCourseAngle(float lat1, float long1, float lat2, float long2) {
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void) {
+void Error_Handler(void)
+{
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
 
