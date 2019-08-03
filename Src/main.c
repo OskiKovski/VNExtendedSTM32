@@ -74,7 +74,7 @@ void vibrateAllMotorsForGivenTime(int);
 
 void vibrateTheProperDirectionMotorOnce(float, char[100]);
 
-void vibrateMotorsForFinish();
+void vibrateMotorsForFinish(char[100]);
 
 float getCurrentCourseAngle(float, float, float, float);
 /* USER CODE END PFP */
@@ -185,9 +185,11 @@ int main(void)
 
     if (distanceForTarget < 5) {
       if (targetPointIndex >= numberOfPoints) {
-        vibrateMotorsForFinish();
+        vibrateMotorsForFinish(output_buffer);
         break;
       }
+      sprintf(output_buffer, "NASTEPNY PUNKT");
+      HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
       vibrateAllMotorsForGivenTime(2000);
       ++targetPointIndex;
     }
@@ -241,7 +243,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 24;
+  RCC_OscInitStruct.PLL.PLLN = 40;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -258,7 +260,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -364,7 +366,9 @@ void vibrateTheProperDirectionMotorOnce(float destinationAngle, char output_buff
   }
 }
 
-void vibrateMotorsForFinish() {
+void vibrateMotorsForFinish(char output_buffer[100]) {
+  sprintf(output_buffer, "KONIEC\n\r");
+  HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
   vibrateAllMotorsForGivenTime(500);
   HAL_Delay(1000);
   vibrateAllMotorsForGivenTime(500);
