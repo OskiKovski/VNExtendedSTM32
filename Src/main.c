@@ -188,24 +188,31 @@ int main(void)
         vibrateMotorsForFinish(output_buffer);
         break;
       }
-      sprintf(output_buffer, "NASTEPNY PUNKT");
+      sprintf(output_buffer, "NASTEPNY PUNKT\n\r");
       HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
       vibrateAllMotorsForGivenTime(2000);
       ++targetPointIndex;
     }
 
-    if (distance0 < 100 && distance0 > 20) {
-      sprintf(output_buffer, "IDZ W LEWO");
+    if(distance0 < 100 && distance0 > 20 && distance1 < 100 && distance1 > 20) {
+      sprintf(output_buffer, "UCIEKAJ DO PRZODU\n\r");
       HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
-      HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 1);
+      HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 1);
       HAL_Delay(1000);
-      HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
-    } else if (distance1 < 100 && distance1 > 20) {
-      sprintf(output_buffer, "IDZ W PRAWO");
+      HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, 0);
+    }
+    else if (distance0 < 100 && distance0 > 20) {
+      sprintf(output_buffer, "UCIEKAJ W PRAWO\n\r");
       HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
       HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 1);
       HAL_Delay(1000);
       HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, 0);
+    } else if (distance1 < 100 && distance1 > 20) {
+      sprintf(output_buffer, "UCIEKAJ W LEWO\n\r");
+      HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+      HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 1);
+      HAL_Delay(1000);
+      HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
     } else {
       vibrateTheProperDirectionMotorOnce(
           getCurrentCourseAngle(currentLatitude, currentLongitude, targetLatitude, targetLongitude),
