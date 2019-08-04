@@ -199,11 +199,11 @@ float course_to (float lat1, float long1, float lat2, float long2)
   float a2 = sin(lat1) * cos(lat2) * cos(dlon);
   a2 = cos(lat1) * sin(lat2) - a2;
   a2 = atan2(a1, a2);
-  if (a2 < 0.0)
-  {
-    a2 += M_2_PI;
+  a2 = degrees(a2);
+  if (a2 < 0.0) {
+    a2 += 360;
   }
-  return degrees(a2);
+  return a2;
 }
 
 float distance_between (float lat1, float long1, float lat2, float long2)

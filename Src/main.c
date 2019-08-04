@@ -76,7 +76,7 @@ void vibrateTheProperDirectionMotorOnce(float, char[100]);
 
 void vibrateMotorsForFinish(char[100]);
 
-float getCurrentCourseAngle(float, float, float, float);
+float getCurrentCourseAngle(float, float, float, float, char[100]);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -215,7 +215,7 @@ int main(void)
       HAL_GPIO_WritePin(LED_White_GPIO_Port, LED_White_Pin, 0);
     } else {
       vibrateTheProperDirectionMotorOnce(
-          getCurrentCourseAngle(currentLatitude, currentLongitude, targetLatitude, targetLongitude),
+          getCurrentCourseAngle(currentLatitude, currentLongitude, targetLatitude, targetLongitude, output_buffer),
           output_buffer);
     }
     /* USER CODE END WHILE */
@@ -383,10 +383,14 @@ void vibrateMotorsForFinish(char output_buffer[100]) {
   vibrateAllMotorsForGivenTime(1000);
 }
 
-float getCurrentCourseAngle(float lat1, float long1, float lat2, float long2) {
+float getCurrentCourseAngle(float lat1, float long1, float lat2, float long2, char output_buffer[100]) {
   int16_t currentHeading = HMC5883L_GetAngle();
-  int16_t currentBearing = course_to(lat1, long1, lat2, long2);
-  float currentCourseAngle = currentBearing - currentHeading;
+  sprintf(output_buffer, "Kierujesz sie na ten kat: %f\n\r", (float)currentHeading);
+  HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+  float currentBearing = course_to(lat1, long1, lat2, long2);
+  sprintf(output_buffer, "Twoj cel pod tym katem: %f\n\r", currentBearing);
+  HAL_UART_Transmit(&huart2, output_buffer, strlen(output_buffer), 100);
+  float currentCourseAngle = currentBearing - (float)currentHeading;
   if (currentCourseAngle < 0) {
     currentCourseAngle += 360;
   }
